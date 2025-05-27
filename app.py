@@ -483,14 +483,13 @@ if not filtered_df.empty:
             title=f"Perkembangan Topik ({selected_sentiment.capitalize()})",
             # color_discrete_sequence=px.colors.sequential.YlOrBr  # Palet kuning-oranye
             color_discrete_sequence = [
-                # "#242320",  # hitam kebiruan gelap – untuk kontras
-                # "#645A40",  # cokelat olive – tone bumi
-                # "#FED106",  # warna utama: kuning keemasan
-                # "#F4C300",  # variasi kuning lebih hangat
-                "#E4D86C",  # kuning pastel
-                "#B0A14A",  # emas olive tua
-                "#FFE97F",  # kuning pucat / creamy
-                "#D1AF1E"   # emas mustard tua
+                # "#6B5B95",  # ungu gelap – kontras rendah
+                # "#88B04B",  # hijau olive – tone alami, lembut
+                # "#FF6F61",  # coral/oranye kemerahan – hangat & mencolok
+                "#92A8D1",  # biru keabu – netral dan lembut
+                "#F7CAC9",  # pink pastel – kontras dengan kuning
+                "#955251",  # merah tua ke coklat – hangat dan berat
+                "#FED106"   # kuning keemasan – paling terang untuk nilai tertinggi
             ]
 
         )
