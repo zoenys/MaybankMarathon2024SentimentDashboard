@@ -262,8 +262,20 @@ if not filtered_df.empty:
 
     st.altair_chart(combo_chart, use_container_width=True)
 
+    st.markdown("""
+    <p style='font-size: 16px; color: #333;'>
+    Terlihat adanya <b>peningkatan jumlah komentar publik yang signifikan</b> menjelang <b>tanggal 25 Agustus</b>, 
+    dengan <b>puncak aktivitas</b> terjadi tepat pada tanggal tersebut. 
+    Hal ini mengindikasikan adanya <i>momentum atau perhatian khusus</i> dari publik terhadap acara Maybank Marathon 2024.
+    </p>
+    """, unsafe_allow_html=True)
+
+    st.markdown("## Popular Word Analysis")
+    st.markdown("""
+    Bagian ini menyajikan hasil analisis kata dan frasa yang paling sering digunakan dalam percakapan seputar Maybank Marathon 2024. Visualisasi berupa **wordcloud** dan **analisis n-gram** dibuat untuk menggambarkan pola umum dalam penggunaan kata oleh peserta maupun publik. Semakin sering suatu kata atau frasa muncul, maka akan semakin menonjol dalam visualisasi ini. Analisis ini bertujuan memberikan gambaran awal mengenai topik atau isu yang paling banyak dibicarakan, tanpa melihat konteks atau makna di balik kata-kata tersebut.""")
+
     # ========== POPULAR WORDS ANALYSIS ==========
-    st.markdown("## Popular Words Analysis")
+    st.markdown("### N-Gram Analysis")
 
     # Clean text and filter
     def remove_emotes(text):
@@ -293,6 +305,7 @@ if not filtered_df.empty:
         words_df = words_df[words_df['Sentiment'] == sentiment_option]
 
     text_column = 'standardized_text' if emoji_option == "Dengan Emoji" else 'text_clean'
+
 
     # Sentimen dominan per n-gram
     def get_dominant_sentiment_ngram(ngram, df):
@@ -361,7 +374,7 @@ if not filtered_df.empty:
     st.plotly_chart(fig, use_container_width=True)
 
     # ========== WORD CLOUD SECTION ==========
-    st.markdown("## Word Cloud Analysis")
+    st.markdown("### Word Cloud Analysis")
 
     # Create tabs for each sentiment
     tab1, tab2, tab3 = st.tabs(["Positif", "Netral", "Negatif"])
@@ -426,6 +439,11 @@ if not filtered_df.empty:
 
     # ========== TOPIC MODELLING SECTION ==========
     st.markdown("## Topic Modelling Insights")
+    st.markdown("""
+    Untuk mengidentifikasi tema-tema utama dalam komentar pengguna media sosial terkait Maybank Marathon 2024, dilakukan pemodelan topik (*Topic Modelling*) menggunakan pendekatan berbasis *embedding* dan *clustering*.  
+    Model yang digunakan adalah **BERTopic**, yang menggabungkan representasi semantik dari teks menggunakan *transformer-based embeddings*, teknik reduksi dimensi (*UMAP*), serta algoritma *HDBSCAN* untuk mengelompokkan komentar berdasarkan kemiripan topiknya.
+    """)
+
 
     # Load topic modelling data
     topic_df = pd.read_csv("data/topic_data.csv", parse_dates=["Tanggal"])
@@ -433,13 +451,18 @@ if not filtered_df.empty:
     topic_df['Month'] = topic_df['Tanggal'].dt.to_period('M').dt.to_timestamp()
 
     # Pisahkan UI state dengan memberikan unique key
+    sentiment_options = {
+        "positif": "Positif",
+        "negatif": "Negatif"
+    }
+
     selected_sentiment = st.radio(
         "Pilih sentimen untuk analisis topik:",
-        options=["positif", "negatif"],
+        options=list(sentiment_options.keys()),
+        format_func=lambda x: sentiment_options[x],
         horizontal=True,
         key="topic_sentiment_selector"
     )
-
     # Grouping data bulanan per topic dan sentimen
     df_grouped = (
         topic_df
@@ -449,7 +472,6 @@ if not filtered_df.empty:
     )
 
     df_sent = df_grouped[df_grouped['predict_sentiment_indoBERT'] == selected_sentiment]
-
     # Visualisasi
     if not df_sent.empty:
         fig = px.line(
@@ -458,7 +480,19 @@ if not filtered_df.empty:
             y='Count',
             color='Topic',
             markers=True,
-            title=f"📈 Perkembangan Topik ({selected_sentiment.capitalize()})"
+            title=f"Perkembangan Topik ({selected_sentiment.capitalize()})",
+            # color_discrete_sequence=px.colors.sequential.YlOrBr  # Palet kuning-oranye
+            color_discrete_sequence = [
+                # "#242320",  # hitam kebiruan gelap – untuk kontras
+                # "#645A40",  # cokelat olive – tone bumi
+                # "#FED106",  # warna utama: kuning keemasan
+                # "#F4C300",  # variasi kuning lebih hangat
+                "#E4D86C",  # kuning pastel
+                "#B0A14A",  # emas olive tua
+                "#FFE97F",  # kuning pucat / creamy
+                "#D1AF1E"   # emas mustard tua
+            ]
+
         )
         fig.update_layout(
             xaxis=dict(
@@ -473,6 +507,7 @@ if not filtered_df.empty:
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info(f"Tidak ada data untuk sentimen **{selected_sentiment}**.")
+
 
     with st.expander("## Actionable Insights"):
         st.markdown("""
@@ -495,9 +530,56 @@ if not filtered_df.empty:
     """)
 
 
-else:
-    st.warning("Tidak ada data yang sesuai dengan filter yang dipilih")
+    # # app.py
 
+    # import streamlit as st
+    # from transformers import AutoTokenizer, AutoModelForSequenceClassification
+    # import torch
+    # import torch.nn.functional as F
+
+    # # Load model dan tokenizer
+    # @st.cache_resource
+    # def load_model():
+    #     model = AutoModelForSequenceClassification.from_pretrained("saved_indobert_model")
+    #     tokenizer = AutoTokenizer.from_pretrained("saved_indobert_model")
+    #     model.eval()
+    #     return model, tokenizer
+
+    # model, tokenizer = load_model()
+
+    # # Mapping label index ke nama
+    # inv_label_map = {0: 'negatif', 1: 'netral', 2: 'positif'}
+
+    # # UI
+    # st.set_page_config(page_title="IndoBERT Sentiment Prediction", layout="centered")
+    # st.title("🇮🇩 IndoBERT Sentiment Prediction")
+    # st.markdown("Masukkan satu kalimat untuk mengetahui prediksi sentimennya (positif, netral, negatif).")
+
+    # # Input user
+    # text = st.text_area("Kalimat:", height=150)
+
+    # if st.button("Prediksi"):
+    #     if text.strip() == "":
+    #         st.warning("Silakan masukkan kalimat terlebih dahulu.")
+    #     else:
+    #         # Tokenisasi dan prediksi
+    #         inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    #         with torch.no_grad():
+    #             outputs = model(**inputs)
+    #             probs = F.softmax(outputs.logits, dim=1)
+    #             pred_label = torch.argmax(probs, dim=1).item()
+
+    #         sentiment = inv_label_map[pred_label]
+    #         st.success(f"**Prediksi Sentimen:** {sentiment.capitalize()}")
+
+    #         # Tampilkan probabilitas per kelas
+    #         st.subheader("Probabilitas:")
+    #         for i, label in inv_label_map.items():
+    #             st.write(f"- {label.capitalize()}: {probs[0][i].item():.2%}")
+
+
+    # else:
+    #     st.warning("Tidak ada data yang sesuai dengan filter yang dipilih")
 
 
 
