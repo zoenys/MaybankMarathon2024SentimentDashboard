@@ -530,58 +530,6 @@ if not filtered_df.empty:
     """)
 
 
-    # # app.py
-
-    # import streamlit as st
-    # from transformers import AutoTokenizer, AutoModelForSequenceClassification
-    # import torch
-    # import torch.nn.functional as F
-
-    # # Load model dan tokenizer
-    # @st.cache_resource
-    # def load_model():
-    #     model = AutoModelForSequenceClassification.from_pretrained("saved_indobert_model")
-    #     tokenizer = AutoTokenizer.from_pretrained("saved_indobert_model")
-    #     model.eval()
-    #     return model, tokenizer
-
-    # model, tokenizer = load_model()
-
-    # # Mapping label index ke nama
-    # inv_label_map = {0: 'negatif', 1: 'netral', 2: 'positif'}
-
-    # # UI
-    # st.set_page_config(page_title="IndoBERT Sentiment Prediction", layout="centered")
-    # st.title("🇮🇩 IndoBERT Sentiment Prediction")
-    # st.markdown("Masukkan satu kalimat untuk mengetahui prediksi sentimennya (positif, netral, negatif).")
-
-    # # Input user
-    # text = st.text_area("Kalimat:", height=150)
-
-    # if st.button("Prediksi"):
-    #     if text.strip() == "":
-    #         st.warning("Silakan masukkan kalimat terlebih dahulu.")
-    #     else:
-    #         # Tokenisasi dan prediksi
-    #         inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    #         with torch.no_grad():
-    #             outputs = model(**inputs)
-    #             probs = F.softmax(outputs.logits, dim=1)
-    #             pred_label = torch.argmax(probs, dim=1).item()
-
-    #         sentiment = inv_label_map[pred_label]
-    #         st.success(f"**Prediksi Sentimen:** {sentiment.capitalize()}")
-
-    #         # Tampilkan probabilitas per kelas
-    #         st.subheader("Probabilitas:")
-    #         for i, label in inv_label_map.items():
-    #             st.write(f"- {label.capitalize()}: {probs[0][i].item():.2%}")
-
-
-    # else:
-    #     st.warning("Tidak ada data yang sesuai dengan filter yang dipilih")
-
-
 
 # CSS styling
 st.markdown("""
